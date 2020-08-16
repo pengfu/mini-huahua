@@ -1,0 +1,89 @@
+/**index.wxss**/
+
+page {
+  background: #f6f6f6;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.bg-darkGray {
+	background-color:  #f6f6f6;
+	color:#ffffff;
+}
+
+.ai-view{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50rpx;
+}
+.txt{
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #00cc77;
+}
+.tip{
+  font-size: 22rpx;
+  color: #00cc77;
+  margin-top: 20rpx;
+}
+.ai-paizhao{
+  width: 200rpx;
+  height: 200rpx;
+  margin-top: 300rpx;
+}
+.float-view{
+  position:absolute;
+  z-index:9;
+  width: 100rpx;
+  height: 100rpx;
+  margin-right: 50rpx;
+  margin-bottom: 50rpx;
+}
+
+
+
+.box {
+  position: fixed;
+  top: 0;
+  /* left: 0; */
+  right: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-direction: column;
+  width: 600rpx;
+}
+.arrow {
+  width: 0;
+  height: 0;
+  margin-right: 120rpx;
+  border-width: 20rpx;
+  border-style: solid;
+  border-color:  transparent transparent #00cc77 transparent;
+}
+.body {
+  background-color: #00cc77;
+  box-shadow: 0 10rpx 20rpx -10rpx #00cc77;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84rpx;
+  padding: 0 20rpx;
+  margin-right: 40rpx;
+}
+.body > text {
+  color: #FFF;
+  font-size: 28rpx;
+  font-weight: 400;
+}
+
+.img{
+  width: 40rpx;
+  height: 40rpx;
+}
