@@ -39,24 +39,56 @@ Page({
     }
     this.ctx.takePhoto({
       quality: 'low',
-      success: (res) => {
+      success: (result) => {
         that.setData({
-          src: res.tempImagePath,
+          src: result.tempImagePath,
           isCamera: false,
           btnTxt: "重拍"
         })
         wx.showLoading({
-          title: '正在加载中',
+          title: '正在识别中',
         })
-        var index = res.tempImagePath.lastIndexOf(".")
+        var index = result.tempImagePath.lastIndexOf(".")
         console.log("===index===" + index)
-        var mineType = res.tempImagePath.substr(index + 1)
+        var mineType = result.tempImagePath.substr(index + 1)
         console.log("===mineType===" + mineType)
         mineType = "image/" + mineType
-        wx.getImageInfo({
-          src: res.tempImagePath,
-          success: function (res) {
-            that.cutImg(res)
+        console.log('1111111',result.tempImagePath);
+       
+
+        const filePath = result.tempImagePath
+        const prefix = filePath.replace('wxfile://', '').split('.')[0]
+        // 上传图片
+        const cloudPath = prefix + filePath.match(/\.[^.]+?$/)[0]
+       
+        wx.cloud.uploadFile({
+          cloudPath,
+          filePath,
+          success: res => {
+            console.log('[上传文件] 成功：', res)
+            wx.getImageInfo({
+              src: result.tempImagePath,
+              success: function (res) {
+                that.cutImg(res)
+              }
+            })
+            // app.globalData.fileID = res.fileID
+            // app.globalData.cloudPath = cloudPath
+            // app.globalData.imagePath = filePath
+            
+            // wx.navigateTo({
+            //   url: '../storageConsole/storageConsole'
+            // })
+          },
+          fail: e => {
+            console.error('[上传文件] 失败：', e)
+            wx.showToast({
+              icon: 'none',
+              title: '上传失败',
+            })
+          },
+          complete: () => {
+            // wx.hideLoading()
           }
         })
 
@@ -124,10 +156,6 @@ Page({
       success: res => {
         console.log("=onCheckImg=success===" + JSON.stringify(res))
         if (res.result.errCode == 0) {
-          wx.showToast({
-            icon: 'none',
-            title: 'onCheckImg success callback',
-          })
           that.req(that.data.accessToken, buffer)
         } else if (res.result.errCode == 87014) {
           wx.hideLoading()
