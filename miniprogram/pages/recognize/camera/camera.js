@@ -1,4 +1,5 @@
 var http = require('../../../utils/http.js')
+const app = getApp()
 Page({
   data: {
     accessToken: "",
@@ -11,6 +12,7 @@ Page({
     cHeight: 0
   },
   onLoad() {
+    this.onGetOpenid()
     this.ctx = wx.createCameraContext()
     var time = wx.getStorageSync("time")
     var curTime = new Date().getTime()
@@ -19,14 +21,50 @@ Page({
     console.log("=======" + timeNum)
     var accessToken = wx.getStorageSync("access_token")
     console.log("====accessToken===" + accessToken + "a")
-    if (timeNum > 28 || (accessToken == "" ||
-        accessToken == null || accessToken == undefined)) {
+    if (timeNum > 28 || !accessToken) {
       this.accessTokenFunc()
     } else {
       this.setData({
         accessToken: wx.getStorageSync("access_token")
       })
     }
+  },
+  onGetOpenid: function() {
+    // 调用云函数
+    wx.cloud.callFunction({
+      name: 'login',
+      data: {},
+      success: res => {
+        console.log('[云函数] [login] user openid: ', res.result.openid)
+        app.globalData.openid = res.result.openid
+        // wx.navigateTo({
+        //   url: '../userConsole/userConsole',
+        // })
+      },
+      fail: err => {
+        console.error('[云函数] [login] 调用失败', err)
+        // wx.navigateTo({
+        //   url: '../deployFunctions/deployFunctions',
+        // })
+      }
+    })
+  },
+  onAdd: function (data) {
+    const db = wx.cloud.database()
+    db.collection('plants').add({
+      data,
+      success: res => {
+        // 在返回结果中会包含新创建的记录的 _id 
+        console.log('[数据库] [新增记录] 成功，记录 _id: ', res._id)
+      },
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '新增记录失败'
+        })
+        console.error('[数据库] [新增记录] 失败：', err)
+      }
+    })
   },
   takePhoto() {
     var that = this
@@ -48,24 +86,26 @@ Page({
         wx.showLoading({
           title: '正在识别中',
         })
-        var index = result.tempImagePath.lastIndexOf(".")
-        console.log("===index===" + index)
-        var mineType = result.tempImagePath.substr(index + 1)
-        console.log("===mineType===" + mineType)
-        mineType = "image/" + mineType
-        console.log('1111111',result.tempImagePath);
+        // var index = result.tempImagePath.lastIndexOf(".")
+        // console.log("===index===" + index)
+        // var mineType = result.tempImagePath.substr(index + 1)
+        // console.log("===mineType===" + mineType)
+        // mineType = "image/" + mineType
+        // console.log('1111111',result.tempImagePath);
        
-
         const filePath = result.tempImagePath
         const prefix = filePath.replace('wxfile://', '').split('.')[0]
         // 上传图片
         const cloudPath = prefix + filePath.match(/\.[^.]+?$/)[0]
+        console.log('cloudPath is -------', cloudPath)
        
         wx.cloud.uploadFile({
           cloudPath,
           filePath,
           success: res => {
             console.log('[上传文件] 成功：', res)
+            // 处理插入数据库
+            this.onAdd({openId: app.globalData.openId, src: res.fileID});
             wx.getImageInfo({
               src: result.tempImagePath,
               success: function (res) {
@@ -91,8 +131,6 @@ Page({
             // wx.hideLoading()
           }
         })
-
-       
       }
     })
   },
@@ -202,7 +240,6 @@ Page({
         })
       } else {
         wx.clearStorageSync("access_token")
-       
       }
     }, "POST")
   },

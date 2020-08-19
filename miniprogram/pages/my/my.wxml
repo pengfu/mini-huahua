@@ -1,2 +1,11 @@
 <!--pages/my/my.wxml-->
-<text>pages/my/my.wxml</text>
+<view 
+      wx:for="{{plants}}"
+      wx:key="{{item._id}}"
+      id="item-{{index}}"
+    >
+      <image 
+        src="{{item.src}}"
+        mode="scaleToFill"
+      ></image> 
+    </view>
