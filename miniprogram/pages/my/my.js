@@ -7,7 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    plants: []
+    plant: {}
   },
 
   onQuery: function() {
@@ -15,10 +15,10 @@ Page({
     // 查询当前用户所有的 counters
     db.collection('plants').where({
       _openid: app.globalData.openid
-    }).get({
+    }).orderBy('created_at', 'desc').get({
       success: res => {
         this.setData({
-          plants: res.data
+          plant: res.data[0]
         })
         console.log('[数据库] [查询记录] 成功: ', res)
       },

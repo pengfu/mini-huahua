@@ -49,6 +49,33 @@ Page({
       }
     })
   },
+  onUpload: function(result) {
+    const cloudPath = app.globalData.cloudPath
+    const filePath = app.globalData.filePath
+    wx.cloud.uploadFile({
+      cloudPath,
+      filePath,
+      success: res => {
+        console.log('[上传文件] 成功：', res)
+        // 处理插入数据库
+        this.onAdd({openId: app.globalData.openId, src: res.fileID, result: result, created_at: new Date().getTime()});
+       
+        wx.navigateTo({
+          url: '/pages/my/my'
+        })
+      },
+      fail: e => {
+        console.error('[上传文件] 失败：', e)
+        wx.showToast({
+          icon: 'none',
+          title: '上传失败',
+        })
+      },
+      complete: () => {
+        // wx.hideLoading()
+      }
+    })
+  },
   onAdd: function (data) {
     const db = wx.cloud.database()
     db.collection('plants').add({
@@ -97,40 +124,19 @@ Page({
         const prefix = filePath.replace('wxfile://', '').split('.')[0]
         // 上传图片
         const cloudPath = prefix + filePath.match(/\.[^.]+?$/)[0]
+        app.globalData.cloudPath = cloudPath
+        app.globalData.filePath = filePath
         console.log('cloudPath is -------', cloudPath)
-       
-        wx.cloud.uploadFile({
-          cloudPath,
-          filePath,
-          success: res => {
-            console.log('[上传文件] 成功：', res)
-            // 处理插入数据库
-            this.onAdd({openId: app.globalData.openId, src: res.fileID});
-            wx.getImageInfo({
-              src: result.tempImagePath,
-              success: function (res) {
-                that.cutImg(res)
-              }
-            })
-            // app.globalData.fileID = res.fileID
-            // app.globalData.cloudPath = cloudPath
-            // app.globalData.imagePath = filePath
-            
-            // wx.navigateTo({
-            //   url: '../storageConsole/storageConsole'
-            // })
-          },
-          fail: e => {
-            console.error('[上传文件] 失败：', e)
-            wx.showToast({
-              icon: 'none',
-              title: '上传失败',
-            })
-          },
-          complete: () => {
-            // wx.hideLoading()
+
+        wx.getImageInfo({
+          src: result.tempImagePath,
+          success: function (res) {
+            that.cutImg(res)
           }
         })
+
+        
+      
       }
     })
   },
@@ -234,6 +240,11 @@ Page({
           results: results
         })
         console.log(results)
+        let result = ''
+        if(results.length > 0) {
+          result = results[0]
+        }
+        that.onUpload(result)
         wx.showToast({
           icon: 'none',
           title: JSON.stringify(results),
@@ -272,23 +283,6 @@ Page({
   //     url: '/pages/result/list?keyword=' + e.detail.value,
   //   })
   // },
-  // hideModal: function() {
-  //   this.setData({
-  //     isShow: false,
-  //   })
-  // },
-  // stopRecord() {
-  //   this.ctx.stopRecord({
-  //     success: (res) => {
-  //       this.setData({
-  //         src: res.tempThumbPath,
-  //         videoSrc: res.tempVideoPath
-  //       })
-  //     }
-  //   })
-  // },
-  // error(e) {
-  //   console.log(e.detail)
-  // }
+  
 
 })

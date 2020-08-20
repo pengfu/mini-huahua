@@ -1,1 +1,8 @@
 /* pages/my/my.wxss */
+.reg-result {
+  font-size: 20px;
+}
+.reg-img {
+  width: 100%;
+  margin-top:20px;
+}

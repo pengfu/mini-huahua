@@ -13,22 +13,7 @@
     "navigationBarTitleText": "拍图识植",
     "navigationBarTextStyle": "black"
   },
-  "tabBar": {
-    "list": [
-      {
-        "pagePath": "pages/recognize/recognize",
-        "text": "识别",
-        "iconPath": "images/icon_ai_default.png",
-        "selectedIconPath": "images/icon_ai.png"
-      },
-      {
-        "pagePath": "pages/my/my",
-        "text": "我的",
-        "iconPath": "images/icon_sort_default.png",
-        "selectedIconPath": "images/icon_sort.png"
-      }
-    ]
-  },
+  
   "sitemapLocation": "sitemap.json",
   "style": "v2"
 }
